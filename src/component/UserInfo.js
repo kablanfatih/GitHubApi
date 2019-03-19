@@ -18,7 +18,8 @@ class UserInfo extends Component {
         email: "",
         followers: "",
         following: "",
-        error: false
+        error: false,
+        isVisible: false
     };
 
     getUser = async username => {
@@ -49,19 +50,32 @@ class UserInfo extends Component {
         const username = this.refs.username.value;
 
         if (!this.validateForm(username)) {
-            this.setState({
-                error: true
-            });
+
+            this.setState({error: true});
+
+            setTimeout(() => {
+
+                this.setState({
+                    error: false
+                });
+            }, 2000);
             return;
         }
 
-        await this.getUser(username).catch(() => alert("Lütfen Girdiğiniz Bilgileri Kontrol Ediniz."));
+        await this.getUser(username)
+            .then(() => {
+                this.setState({
+                    isVisible: true
+                })
+            })
+            .catch(() => alert("Lütfen Girdiğiniz Bilgileri Kontrol Ediniz."));
+
         await this.getRepoInfo(username);
     }
 
     render() {
 
-        const {login, html_url, avatar_url, bio, public_repos, company, location, email, followers, following, repoInfosData, error} = this.state;
+        const {login, html_url, avatar_url, bio, public_repos, company, location, email, followers, following, repoInfosData, error, isVisible} = this.state;
 
         return (
 
@@ -85,48 +99,53 @@ class UserInfo extends Component {
 
                 </div>
 
-                <div className="card card-body ml-5 mb-3">
-                    <div className="row">
-                        <div className="col-md-4">
-                            <a href={html_url} target="_blank" rel="noopener noreferrer">
-                                <img className="img-fluid mb-2"
-                                     src={avatar_url} alt=""/> </a>
-                            <hr/>
-                            <div id="fullName"><strong>{login}</strong></div>
-                            <hr/>
-                            <div id="bio">{bio}</div>
+                {isVisible ?
+                    <div>
+                        <div className="card card-body mb-3">
+                            <div className="row">
+                                <div className="col-md-4">
+                                    <a href={html_url} target="_blank" rel="noopener noreferrer">
+                                        <img className="img-fluid mb-2"
+                                             src={avatar_url} alt=""/> </a>
+                                    <hr/>
+                                    <div id="fullName"><strong>{login}</strong></div>
+                                    <hr/>
+                                    <div id="bio">{bio}</div>
+                                </div>
+                                <div className="col-md-8 pt-5">
+                                    <button className="btn btn-secondary">
+                                        Takipçi <span className="badge badge-light">{followers}</span>
+                                    </button>
+                                    <button className="btn btn-info">
+                                        Takip Edilen <span className="badge badge-light">{following}</span>
+                                    </button>
+                                    <button className="btn btn-danger">
+                                        Repolar <span className="badge badge-light">{public_repos}</span>
+                                    </button>
+                                    <hr/>
+                                    <li className="list-group"/>
+                                    <li className="list-group-item borderzero">
+                                        <img src={companyPng} width="30px" alt=""/>
+                                        <span id="company">{company}</span>
+                                    </li>
 
-                            <div className="col-md-8">
-                                <button className="btn btn-secondary">
-                                    Takipçi <span className="badge badge-light">{followers}</span>
-                                </button>
-                                <button className="btn btn-info">
-                                    Takip Edilen <span className="badge badge-light">{following}</span>
-                                </button>
-                                <button className="btn btn-danger">
-                                    Repolar <span className="badge badge-light">{public_repos}</span>
-                                </button>
-                                <hr/>
-                                <li className="list-group"/>
-                                <li className="list-group-item borderzero">
-                                    <img src={companyPng} width="30px" alt=""/>
-                                    <span id="company">{company}</span>
-                                </li>
+                                    <li className="list-group-item borderzero">
+                                        <img src={locationPng} width="30px" alt=""/>
+                                        <span id="location">{location}</span>
+                                    </li>
+                                    <li className="list-group-item borderzero">
+                                        <img src={mailPng} width="30px" alt=""/> <span id="company">{email} </span>
 
-                                <li className="list-group-item borderzero">
-                                    <img src={locationPng} width="30px" alt=""/>
-                                    <span id="location">{location}</span>
-                                </li>
-                                <li className="list-group-item borderzero">
-                                    <img src={mailPng} width="30px" alt=""/> <span id="company">{email} </span>
+                                    </li>
 
-                                </li>
-
+                                </div>
                             </div>
                         </div>
+                        <h3>Repositoriler</h3>
                     </div>
-                </div>
+                    : null}
                 <ReposInfo username={repoInfosData}/>
+
             </div>
         );
     }

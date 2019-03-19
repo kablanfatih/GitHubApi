@@ -8,10 +8,11 @@ class ReposInfo extends Component {
         repos.forEach(repo => {
 
             this.refs.repoDiv.innerHTML += `
+
             <div class="mb-2 card-body">
                     <div class="row">
                         <div class="col-md-2">
-                        <a href="${repo.html_url}" target = "_blank" id = "repoName">${repo.name}</a>
+                        <a class="btn btn-danger" href="${repo.html_url}" target = "_blank" id = "repoName">${repo.name}</a>
                         </div>
                         <div class="col-md-6">
                             <button class="btn btn-secondary">
