@@ -7,18 +7,19 @@ import mailPng from "../images/mail.png";
 
 class UserInfo extends Component {
 
-        state = {
-            login:"",
-            htmlUrl: "",
-            avatarUrl: "",
-            bio: "",
-            public_repos: "",
-            company: "",
-            location: "",
-            email: "",
-            followers: "",
-            following: "",
-        };
+    state = {
+        login: "",
+        htmlUrl: "",
+        avatarUrl: "",
+        bio: "",
+        public_repos: "",
+        company: "",
+        location: "",
+        email: "",
+        followers: "",
+        following: "",
+        error: false
+    };
 
     getUser = async username => {
         const responseUser = await axios.get(`https://api.github.com/users/${username}`);
@@ -38,17 +39,29 @@ class UserInfo extends Component {
         this.setState({repoInfosData});
     };
 
+    validateForm = (username) => {
+
+        return !(username === "");
+    };
+
     async handleSubmit(e) {
         e.preventDefault();
         const username = this.refs.username.value;
-        await this.getUser(username);
+
+        if (!this.validateForm(username)) {
+            this.setState({
+                error: true
+            });
+            return;
+        }
+
+        await this.getUser(username).catch(() => alert("Lütfen Girdiğiniz Bilgileri Kontrol Ediniz."));
         await this.getRepoInfo(username);
     }
 
     render() {
 
-        const {login, html_url, avatar_url, bio, public_repos, company, location, email, followers, following, repoInfosData} = this.state;
-
+        const {login, html_url, avatar_url, bio, public_repos, company, location, email, followers, following, repoInfosData, error} = this.state;
 
         return (
 
@@ -58,13 +71,17 @@ class UserInfo extends Component {
                     <p className="lead">
                         Bir kullanıcı adı girin ve kullanıcının bilgilerine ulaşın!
                     </p>
+                    {
+                        error ?
+                            <div className="alert alert-danger">Lütfen Kullanıcı Adını Giriniz</div>
+                            : null
+                    }
                     <form onSubmit={e => this.handleSubmit(e)}>
                         <input ref='username' type="text" name="username" className="form-control"
                                placeholder="Github Kullanıcı adı"/>
                         <br/>
                         <button type="submit" className="btn btn-dark">Ara</button>
                     </form>
-
 
                 </div>
 
@@ -105,12 +122,11 @@ class UserInfo extends Component {
 
                                 </li>
 
-
                             </div>
                         </div>
                     </div>
                 </div>
-                <ReposInfo username = {repoInfosData}/>
+                <ReposInfo username={repoInfosData}/>
             </div>
         );
     }
